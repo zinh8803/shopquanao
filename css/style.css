@@ -97,14 +97,14 @@
     border-radius: 10px;
 }
 
-.services_list-s .product_men:hover {
+.services .product_men:hover {
 
     transform: scale(1.05);
     border: 1px solid #d50000;
     cursor: pointer;
 }
 
-.services_list-s .product_men {
+.services .product_men {
 
     transition: 0.5s ease;
 }

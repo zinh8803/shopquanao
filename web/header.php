@@ -58,7 +58,7 @@
                     </div>
 
                     <!-- Shopping Icon -->
-                    <a href="#" class="shopping"><i class="fa-solid fa-cart-shopping"></i></a>
+                    <a href="cart.php" class="shopping"><i class="fa-solid fa-cart-shopping"></i></a>
                 </div>
             </div>
         </nav>
