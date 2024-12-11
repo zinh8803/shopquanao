@@ -1,0 +1,252 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* header */
+.menu {
+    background-color: rgb(161, 155, 155);
+    position: fixed;
+    z-index: 3;
+    width: 100%;
+    margin-top: -100px;
+}
+
+.navbar-brand {
+    font-size: 2rem;
+    color: black;
+
+
+}
+
+.menu .login {
+    margin-top: 5px;
+    padding-left: 20px;
+    color: black;
+}
+
+.menu .shopping {
+
+    padding-left: 20px;
+    color: black;
+}
+
+.navbar div li {
+    margin-left: 40px;
+}
+
+.navbar-brand :hover {
+    color: black;
+
+}
+
+.nav-link {
+
+    color: black;
+    font-family: 'Rubik', sans-serif;
+    text-transform: uppercase;
+    /* display: flex; */
+}
+
+.nav-link:hover {
+
+    display: block;
+    background-color: white;
+}
+
+.slide {
+    margin-top: 100px;
+}
+
+
+/* about */
+.about p {
+    font-size: 20px;
+
+}
+
+.about .title_ab1 {
+    display: flex;
+    justify-content: center;
+
+}
+
+.about .about-title {
+    color: red;
+}
+
+.about_1 p b {
+    color: black;
+
+}
+
+@media only screen and (max-width:750px) {
+    .about .about_last .image_last img {
+        width: 100px !important;
+    }
+
+}
+
+
+/* services */
+.services_title strong {
+    background-color: red;
+    color: white;
+    padding: 10px 12px 5px 12px;
+    border-radius: 10px;
+}
+
+.services_list-s .product_men:hover {
+
+    transform: scale(1.05);
+    border: 1px solid #d50000;
+    cursor: pointer;
+}
+
+.services_list-s .product_men {
+
+    transition: 0.5s ease;
+}
+
+
+.product_men .position-relative {
+    position: relative;
+}
+
+.product_men img.card-img-top {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.product_men p b {
+    color: red;
+}
+
+@media only screen and (min-width: 401px) and (max-width: 850px) {
+    .services_list-s .product_men {
+        margin-left: 3px;
+        width: 200px !important;
+    }
+
+    .services_list-s .product_men img {
+        width: 120px;
+    }
+
+    .services_list-s .product_men .card-text {
+        display: none;
+    }
+}
+
+@media only screen and (max-width:400px) {
+
+    .services_list-s .product_men {
+        margin-left: 3px;
+        width: 180px !important;
+    }
+
+    .services_list-s .product_men img {
+        width: 100px;
+    }
+
+    .services_list-s .product_men .card-text {
+        display: none;
+
+    }
+}
+
+/* pricing */
+#pricing .h1 {
+    color: red;
+    font-weight: 500;
+}
+
+.formfricing {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+
+}
+
+.title_pri {
+    display: flex;
+    justify-content: center;
+}
+
+.btn_pricing {
+    width: 100px;
+
+}
+
+
+/* title */
+.title_lab {
+    display: flex;
+    justify-content: center;
+
+}
+
+.lab1 {
+    border: 1px solid #050505;
+    margin: 20px;
+}
+
+.lab1 p a {
+    color: black;
+    font-size: 25px;
+}
+
+
+/* footer */
+.footer {
+
+    background-color: rgb(161, 155, 155);
+    color: white;
+    padding-bottom: 0;
+}
+
+.footer ul {
+    text-decoration: none;
+    list-style-type: none;
+}
+
+.footer__widget {
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.footer__widget h6 {
+    color: #1c1c1c;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.footer__widget ul {
+    width: 50%;
+    float: left;
+}
+
+.footer__widget ul li {
+    list-style: none;
+    margin-left: -30px;
+}
+
+.footer__widget ul li a {
+    color: #1c1c1c;
+    font-size: 14px;
+    line-height: 32px;
+    text-decoration: none;
+}
+
+.footer__about ul li {
+    margin-left: -30px;
+    color: black;
+}
+
+.footer__about h6 {
+    color: #1c1c1c;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
