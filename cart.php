@@ -1,31 +1,29 @@
 <?php
-session_start(); // Khởi tạo session
+session_start(); 
 include("./data_connect/db.php");
 
-// Xử lý xóa sản phẩm khỏi giỏ hàng
+
 if (isset($_GET['remove'])) {
     $product_id = (int)$_GET['remove'];
     if (isset($_SESSION['cart'][$product_id])) {
-        unset($_SESSION['cart'][$product_id]); // Xóa sản phẩm khỏi giỏ hàng
+        unset($_SESSION['cart'][$product_id]);
     }
     header("Location: cart.php");
     exit();
 }
 
-// Xử lý xóa toàn bộ giỏ hàng
+
 if (isset($_GET['clear'])) {
-    unset($_SESSION['cart']); // Xóa toàn bộ giỏ hàng
+    unset($_SESSION['cart']); 
     header("Location: cart.php");
     exit();
 }
 
-// Xử lý cập nhật số lượng sản phẩm trong giỏ hàng qua AJAX
 if (isset($_POST['action']) && $_POST['action'] === 'update_quantity') {
     $product_id = (int)$_POST['product_id'];
     $quantity = (int)$_POST['quantity'];
 
     if ($quantity > 0) {
-        // Kiểm tra stock_quantity từ cơ sở dữ liệu
         $sql_stock = "SELECT stock_quantity, price FROM products WHERE product_id = ?";
         $stmt_stock = $conn->prepare($sql_stock);
         $stmt_stock->bind_param("i", $product_id);
@@ -45,7 +43,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_quantity') {
             } else {
                 $_SESSION['cart'][$product_id] = $quantity;
 
-                // Tính tổng tiền của sản phẩm và giỏ hàng
+             
                 $subtotal = $price * $quantity;
                 $total = 0;
                 foreach ($_SESSION['cart'] as $id => $qty) {
@@ -65,7 +63,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_quantity') {
     exit();
 }
 
-// Kiểm tra nếu giỏ hàng có sản phẩm
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
     $product_ids = array_keys($_SESSION['cart']);
     $ids = implode(',', $product_ids);
@@ -80,6 +77,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <title>Giỏ hàng</title>
 </head>
@@ -87,8 +85,9 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 <style>
     .content {
         background-color: #f8f9fa;
-        min-height: calc(100vh - 200px); /* Để footer không bị tràn lên */
+        min-height: calc(100vh - 200px);
     }
+    
 </style>
 
 <?php include("web/header.php"); ?>

@@ -38,9 +38,67 @@ if (isset($_GET['add'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="./fonts/fontawesome-free-6.5.2-web/fontawesome-free-6.5.2-web/css/all.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">    
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
     <title>Sản phẩm</title>
 </head>
 <body>
+<style>
+    .product_men {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    border: none;
+    border-radius: 10px; /* Bo góc */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+.product_men img {
+    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.product_men:hover {
+    transform: translateY(-8px); /* Di chuyển lên một chút */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Tăng độ đổ bóng */
+}
+
+.product_men:hover img {
+    transform: scale(1.1); /* Phóng to ảnh khi hover */
+    filter: brightness(0.9); /* Làm tối ảnh một chút */
+}
+
+.card-body h5.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card-body p.card-text1 {
+    font-size: 1.1rem;
+    text-align: center;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.card-body a.btn {
+    display: block;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    color: white;
+    text-align: center;
+    transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+.card-body a.btn:hover {
+    background: linear-gradient(90deg, #0056b3, #004085);
+    transform: scale(1.05); /* Phóng to nút nhẹ */
+}
+
+</style>
+
+
+
     <!-- menu -->
     <?php include("./web/header.php"); ?>
 
