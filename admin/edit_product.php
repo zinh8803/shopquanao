@@ -50,7 +50,7 @@ if (isset($_POST['update_product'])) {
             echo "<script>alert('File không phải là ảnh!');</script>";
             exit();
         }
-        if (!in_array($image_file_type, ['jpg', 'jpeg', 'png', 'gif', 'jfif'])) {
+        if (!in_array($image_file_type, ['jpg', 'jpeg', 'png', 'gif', 'jfif','webp'])) {
             echo "<script>alert('Chỉ chấp nhận file JPG, JPEG, PNG & GIF!');</script>";
             exit();
         }

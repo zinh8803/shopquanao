@@ -7,19 +7,11 @@ $sql_ao = "SELECT products.product_id, products.name, products.description, prod
            INNER JOIN categories ON products.category_id = categories.category_id
            WHERE categories.category_id = 1";
 $result_ao = $conn->query($sql_ao);
-
-
-
-
-
-
 $sql_quan = "SELECT products.product_id, products.name, products.description, products.price, products.stock_quantity, products.image_url, categories.name AS category_name 
              FROM products 
              INNER JOIN categories ON products.category_id = categories.category_id
              WHERE categories.category_id = 2";
 $result_quan = $conn->query($sql_quan);
-
-
 
 if (isset($_POST['save_product'])) {
     $name = $_POST['name'];
@@ -41,7 +33,7 @@ if (isset($_POST['save_product'])) {
         echo "<script>alert('Ảnh đã tồn tại.');</script>";
         $upload_ok = 0;
     }
-    if ($image_file_type != "jpg" && $image_file_type != "png" && $image_file_type != "jpeg" && $image_file_type != "gif"&& $image_file_type != "jfif") {
+    if ($image_file_type != "jpg" && $image_file_type != "png" && $image_file_type != "jpeg" && $image_file_type != "gif"&& $image_file_type != "jfif"&& $image_file_type != "webp") {
         echo "<script>alert('Chỉ chấp nhận file JPG, JPEG, PNG & GIF.');</script>";
         $upload_ok = 0;
     }
@@ -66,13 +58,6 @@ if (isset($_POST['save_product'])) {
         }
     }
 }
-
-
-
-
-
-
-
 
 ?>
 <!DOCTYPE html>
@@ -113,19 +98,18 @@ if (isset($_POST['save_product'])) {
         #productForm {
             display: none;
         }
-        /* Giới hạn chiều cao và cuộn mô tả */
 .description {
-    max-height: 60px; /* Chiều cao tối đa */
-    overflow-y: auto; /* Cuộn nếu vượt quá */
-    white-space: pre-wrap; /* Giữ định dạng xuống dòng */
+    max-height: 60px; 
+    overflow-y: auto; 
+    white-space: pre-wrap; 
 }
 
-/* Căn chỉnh hình ảnh */
+
 .product-image {
     width: 60px;
     height: 60px;
-    object-fit: cover; /* Cắt ảnh vừa khung */
-    border-radius: 5px; /* Bo góc nhẹ */
+    object-fit: cover;
+    border-radius: 5px; 
     display: block;
     margin: auto;
 }

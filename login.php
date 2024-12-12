@@ -1,29 +1,20 @@
 <?php
-include("./data_connect/db.php"); // Kết nối cơ sở dữ liệu
+include("./data_connect/db.php"); 
 ini_set('session.cookie_lifetime', 300);
-
-// Thiết lập thời gian session kéo dài 5 phút
 ini_set('session.gc_maxlifetime', 300);
 
 session_start();
-// Khởi tạo biến lỗi (nếu có)
 $error = "";
 
-// Kiểm tra xem người dùng có gửi form đăng nhập không
 if (isset($_POST['login'])) {
-    // Lấy dữ liệu từ form đăng nhập
     $username = $_POST['username'];
     $password = $_POST['password'];
-
-    // Truy vấn cơ sở dữ liệu để kiểm tra người dùng
     $sql_check_user = "SELECT * FROM user WHERE username = '$username'";
     $result_check = $conn->query($sql_check_user);
 
     if ($result_check->num_rows > 0) {
-        // Nếu người dùng tồn tại, kiểm tra mật khẩu
         $user = $result_check->fetch_assoc();
         if (password_verify($password, $user['password'])) {
-            // Nếu mật khẩu đúng, đăng nhập thành công
             $_SESSION['user_id'] = $user['Id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['avatar'] = $user['avatar'];
@@ -31,18 +22,16 @@ if (isset($_POST['login'])) {
 
 
             if ($user['role'] == 'admin') {
-                header("Location: admin/admin_product.php"); 
+                header("Location: admin/dashboard.php"); 
             } else {
                 header("Location: index.php"); 
             }
             exit();
             
         } else {
-            // Nếu mật khẩu không đúng
             $error = "Mật khẩu không đúng.";
         }
     } else {
-        // Nếu tên người dùng không tồn tại
         $error = "Tên người dùng không tồn tại.";
     }
 }
@@ -88,6 +77,7 @@ if (isset($_POST['login'])) {
                                 <input type="password" class="form-control" name="password" id="password" placeholder="Nhập mật khẩu" required>
                             </div>
                             <button type="submit" name="login" class="btn btn-primary btn-block">Đăng nhập</button>
+                            <p><a href="sign-up.php">Chưa có tài khoản đăng ký ngay</a></p>
                         </form>
                     </div>
                 </div>

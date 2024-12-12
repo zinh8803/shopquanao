@@ -73,6 +73,7 @@ if(isset($_POST['register'])) {
                                 <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email" required>
                             </div>
                             <button type="submit" name="register" class="btn btn-primary">Đăng Ký</button>
+                            <p><a href="login.php">đã có tài khoản đăng nhập ngay</a></p>
                         </form>
                     </div>
                 </div>
