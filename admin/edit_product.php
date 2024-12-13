@@ -2,78 +2,96 @@
 include("db_connect.php");
 
 if (isset($_GET['product_id'])) {
-    $product_id = $_GET['product_id'];
+    $product_id = (int)$_GET['product_id'];
 
-    $sql = "SELECT * FROM products WHERE product_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    try {
+        $sql = "SELECT * FROM products WHERE product_id = :product_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $stmt->execute();
 
-    if ($result->num_rows > 0) {
-        $product = $result->fetch_assoc();
-    } else {
-        echo "<script>alert('Không tìm thấy sản phẩm!'); window.location.href = 'admin_product.php';</script>";
-        exit();
-    }
-    if (!isset($product['image_url'])) {
-        echo "<script>alert('Dữ liệu ảnh cũ không tồn tại!');</script>";
+        if ($stmt->rowCount() > 0) {
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        } else {
+            echo "<script>alert('Không tìm thấy sản phẩm!'); window.location.href = 'admin_product.php';</script>";
+            exit();
+        }
+    } catch (PDOException $e) {
+        echo "<script>alert('Lỗi hệ thống: {$e->getMessage()}'); window.location.href = 'admin_product.php';</script>";
         exit();
     }
 }
 
 if (isset($_POST['update_product'])) {
-    $product_id = $_POST['product_id']; 
+    $product_id = (int)$_POST['product_id'];
     $name = $_POST['name'];
     $description = $_POST['description'];
     $price = $_POST['price'];
     $stock_quantity = $_POST['stock_quantity'];
     $category_id = $_POST['category_id'];
 
-    $sql_get_product = "SELECT * FROM products WHERE product_id = ?";
-    $stmt_get_product = $conn->prepare($sql_get_product);
-    $stmt_get_product->bind_param("i", $product_id);
-    $stmt_get_product->execute();
-    $result_get_product = $stmt_get_product->get_result();
-    $product = $result_get_product->fetch_assoc();
+    try {
+        $sql_get_product = "SELECT * FROM products WHERE product_id = :product_id";
+        $stmt_get_product = $conn->prepare($sql_get_product);
+        $stmt_get_product->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $stmt_get_product->execute();
 
-    if (!$product) {
-        echo "<script>alert('Không tìm thấy sản phẩm!'); window.location.href = 'admin_product.php';</script>";
-        exit();
-    }
-    if (!empty($_FILES['image']['name'])) {
-        $target_dir = "image_product/"; 
-        $target_file = $target_dir . basename($_FILES["image"]["name"]);
-        $image_file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-        $check = getimagesize($_FILES["image"]["tmp_name"]);
-        if ($check === false) {
-            echo "<script>alert('File không phải là ảnh!');</script>";
+        $product = $stmt_get_product->fetch(PDO::FETCH_ASSOC);
+
+        if (!$product) {
+            echo "<script>alert('Không tìm thấy sản phẩm!'); window.location.href = 'admin_product.php';</script>";
             exit();
         }
-        if (!in_array($image_file_type, ['jpg', 'jpeg', 'png', 'gif', 'jfif','webp'])) {
-            echo "<script>alert('Chỉ chấp nhận file JPG, JPEG, PNG & GIF!');</script>";
-            exit();
-        }
-        if (!empty($product['image_url']) && file_exists("../" . $product['image_url'])) {
-            unlink("../" . $product['image_url']);
-        }
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], "../" . $target_file)) {
-            $image_url = $target_file;
+
+        if (!empty($_FILES['image']['name'])) {
+            $target_dir = "image_product/";
+            $target_file = $target_dir . basename($_FILES["image"]["name"]);
+            $image_file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+            $check = getimagesize($_FILES["image"]["tmp_name"]);
+
+            if ($check === false) {
+                echo "<script>alert('File không phải là ảnh!');</script>";
+                exit();
+            }
+            if (!in_array($image_file_type, ['jpg', 'jpeg', 'png', 'gif', 'jfif', 'webp'])) {
+                echo "<script>alert('Chỉ chấp nhận file JPG, JPEG, PNG & GIF!');</script>";
+                exit();
+            }
+
+            if (!empty($product['image_url']) && file_exists("../" . $product['image_url'])) {
+                unlink("../" . $product['image_url']);
+            }
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], "../" . $target_file)) {
+                $image_url = $target_file;
+            } else {
+                echo "<script>alert('Lỗi khi tải lên ảnh mới!');</script>";
+                exit();
+            }
         } else {
-            echo "<script>alert('Lỗi khi tải lên ảnh mới!');</script>";
-            exit();
+            $image_url = $product['image_url'];
         }
-    } else {
-        $image_url = $product['image_url'];
-    }
-    $sql_update = "UPDATE products SET name = ?, description = ?, price = ?, stock_quantity = ?, image_url = ? , category_id = ? WHERE product_id = ?";
-    $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("ssdisii", $name, $description, $price, $stock_quantity, $image_url, $category_id ,$product_id);
 
-    if ($stmt_update->execute()) {
-        echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href = 'admin_product.php';</script>";
-    } else {
-        echo "<script>alert('Lỗi khi cập nhật sản phẩm!');</script>";
+        $sql_update = "UPDATE products 
+                       SET name = :name, description = :description, price = :price, stock_quantity = :stock_quantity, 
+                           image_url = :image_url, category_id = :category_id 
+                       WHERE product_id = :product_id";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt_update->bindParam(':description', $description, PDO::PARAM_STR);
+        $stmt_update->bindParam(':price', $price, PDO::PARAM_STR);
+        $stmt_update->bindParam(':stock_quantity', $stock_quantity, PDO::PARAM_INT);
+        $stmt_update->bindParam(':image_url', $image_url, PDO::PARAM_STR);
+        $stmt_update->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        $stmt_update->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+
+        if ($stmt_update->execute()) {
+            echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href = 'admin_product.php';</script>";
+        } else {
+            echo "<script>alert('Lỗi khi cập nhật sản phẩm!');</script>";
+        }
+    } catch (PDOException $e) {
+        echo "<script>alert('Lỗi hệ thống: {$e->getMessage()}');</script>";
     }
 }
 ?>
@@ -170,7 +188,7 @@ if (isset($_POST['update_product'])) {
                 <img src="../<?php echo $product['image_url']; ?>" alt="Product Image" style="width: 100px; margin-top: 10px;">
             </div>
             <button type="submit" name="update_product" class="btn btn-primary">Cập nhật</button>
-            <a href="../admin_product.php" class="btn btn-secondary">Hủy</a>
+            <a href="admin_product.php" class="btn btn-secondary">Hủy</a>
         </form>
     </div>
     </div>

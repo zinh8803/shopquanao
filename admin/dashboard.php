@@ -1,3 +1,52 @@
+<?php
+session_start();
+include("db_connect.php");
+
+// Kiểm tra quyền truy cập
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php");
+    exit();
+}
+
+// Tạm thời đặt số lượng đơn hàng pending và cancelled là 0
+$pending_orders = 0;
+$cancelled_orders = 0;
+
+// Lấy tổng số đơn hàng
+$sql_total_orders = "SELECT COUNT(order_id) AS total_orders FROM orders";
+$stmt_total_orders = $conn->prepare($sql_total_orders);
+$stmt_total_orders->execute();
+$total_orders = $stmt_total_orders->fetch(PDO::FETCH_ASSOC)['total_orders'];
+
+// Lấy tổng doanh thu
+$sql_total_revenue = "SELECT SUM(total_price) AS total_revenue FROM orders";
+$stmt_total_revenue = $conn->prepare($sql_total_revenue);
+$stmt_total_revenue->execute();
+$total_revenue = $stmt_total_revenue->fetch(PDO::FETCH_ASSOC)['total_revenue'];
+
+// Tính toán doanh thu theo ngày (giới hạn 30 ngày gần nhất)
+$sql_daily_revenue = "
+    SELECT 
+        DATE(created_at) AS order_date, 
+        SUM(total_price) AS total_revenue 
+    FROM orders 
+    WHERE created_at >= NOW() - INTERVAL 30 DAY
+    GROUP BY DATE(created_at) 
+    ORDER BY order_date ASC";
+$stmt_daily_revenue = $conn->prepare($sql_daily_revenue);
+$stmt_daily_revenue->execute();
+$daily_revenue_data = $stmt_daily_revenue->fetchAll(PDO::FETCH_ASSOC);
+
+// Chuẩn bị dữ liệu cho biểu đồ
+$order_dates = [];
+$daily_revenues = [];
+foreach ($daily_revenue_data as $row) {
+    $order_dates[] = $row['order_date'];
+    $daily_revenues[] = $row['total_revenue'];
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,28 +83,27 @@
 </head>
 <body>
     <!-- Sidebar -->
-  <?php
-  include("includes/sidebar.php")
-  ?>
+    <?php include("includes/sidebar.php"); ?>
 
     <!-- Content -->
     <div class="content">
         <h1>Admin Dashboard</h1>
+
         <!-- Summary Boxes -->
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
                         <h5>Total Orders</h5>
-                        <p class="fs-4">3</p>
+                        <p class="fs-4"><?php echo $total_orders; ?></p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5>Total Amount</h5>
-                        <p class="fs-4">$481.34</p>
+                        <h5>Total Revenue</h5>
+                        <p class="fs-4"><?php echo number_format($total_revenue, 0, ',', '.'); ?>đ</p>
                     </div>
                 </div>
             </div>
@@ -63,7 +111,7 @@
                 <div class="card text-center">
                     <div class="card-body">
                         <h5>Pending Orders</h5>
-                        <p class="fs-4">3</p>
+                        <p class="fs-4"><?php echo $pending_orders; ?></p>
                     </div>
                 </div>
             </div>
@@ -71,7 +119,7 @@
                 <div class="card text-center">
                     <div class="card-body">
                         <h5>Cancelled Orders</h5>
-                        <p class="fs-4">0</p>
+                        <p class="fs-4"><?php echo $cancelled_orders; ?></p>
                     </div>
                 </div>
             </div>
@@ -80,67 +128,58 @@
         <!-- Chart -->
         <div class="card mb-4">
             <div class="card-body">
-                <h5>Earnings Revenue</h5>
-                <canvas id="revenueChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Recent Orders -->
-        <div class="card">
-            <div class="card-body">
-                <h5>Recent Orders</h5>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Order No</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Subtotal</th>
-                            <th>Tax</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Order Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>Divyansh Kumar</td>
-                            <td>1234567891</td>
-                            <td>$172.00</td>
-                            <td>$36.12</td>
-                            <td>$208.12</td>
-                            <td>Ordered</td>
-                            <td>2024-07-11 00:54:14</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h5>Revenue by Day (Last 30 Days)</h5>
+                <canvas id="dailyRevenueChart"></canvas>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Chart.js Example
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const revenueChart = new Chart(ctx, {
-            type: 'bar',
+        const ctx = document.getElementById('dailyRevenueChart').getContext('2d');
+        const dailyRevenueChart = new Chart(ctx, {
+            type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [
-                    {
-                        label: 'Revenue',
-                        data: [1200, 1900, 3000, 5000, 2000, 3000, 4500],
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                labels: <?php echo json_encode($order_dates); ?>,
+                datasets: [{
+                    label: 'Daily Revenue (VND)',
+                    data: <?php echo json_encode($daily_revenues); ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
                     },
-                    {
-                        label: 'Orders',
-                        data: [800, 1400, 2000, 4000, 1800, 2500, 4000],
-                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Revenue (VND)'
+                        },
+                        beginAtZero: true
                     }
-                ]
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return new Intl.NumberFormat().format(context.raw) + " VND";
+                            }
+                        }
+                    }
+                }
             }
         });
     </script>
 </body>
 </html>
+
+

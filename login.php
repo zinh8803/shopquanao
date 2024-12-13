@@ -9,30 +9,39 @@ $error = "";
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $sql_check_user = "SELECT * FROM user WHERE username = '$username'";
-    $result_check = $conn->query($sql_check_user);
 
-    if ($result_check->num_rows > 0) {
-        $user = $result_check->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['Id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['avatar'] = $user['avatar'];
-            $_SESSION['role'] = $user['role'];
+    try {
+        // Truy vấn kiểm tra username
+        $sql_check_user = "SELECT * FROM user WHERE username = :username";
+        $stmt = $conn->prepare($sql_check_user);
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
 
+        if ($stmt->rowCount() > 0) {
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user['role'] == 'admin') {
-                header("Location: admin/dashboard.php"); 
+            // Kiểm tra mật khẩu
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['Id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['avatar'] = $user['avatar'];
+                $_SESSION['role'] = $user['role'];
+
+                if ($user['role'] == 'admin') {
+                    header("Location: admin/dashboard.php"); 
+                } else {
+                    header("Location: index.php"); 
+                }
+                exit();
+
             } else {
-                header("Location: index.php"); 
+                $error = "Mật khẩu không đúng.";
             }
-            exit();
-            
         } else {
-            $error = "Mật khẩu không đúng.";
+            $error = "Tên người dùng không tồn tại.";
         }
-    } else {
-        $error = "Tên người dùng không tồn tại.";
+    } catch (PDOException $e) {
+        $error = "Lỗi kết nối cơ sở dữ liệu: " . $e->getMessage();
     }
 }
 ?>

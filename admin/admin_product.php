@@ -1,17 +1,23 @@
 <?php
-include("db_connect.php"); 
+session_start();
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
+    header("Location: ../login.php");
+    exit();
+}
+if ($_SESSION['role'] !== 'admin') {
+    header("Location: 403.php");
+    exit();
+}
+
+include("db_connect.php");
+
+// Lấy danh sách danh mục từ cơ sở dữ liệu
+$sql_categories = "SELECT * FROM categories";
+$stmt_categories = $conn->prepare($sql_categories);
+$stmt_categories->execute();
+$categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
 
 
-$sql_ao = "SELECT products.product_id, products.name, products.description, products.price, products.stock_quantity, products.image_url, categories.name AS category_name 
-           FROM products 
-           INNER JOIN categories ON products.category_id = categories.category_id
-           WHERE categories.category_id = 1";
-$result_ao = $conn->query($sql_ao);
-$sql_quan = "SELECT products.product_id, products.name, products.description, products.price, products.stock_quantity, products.image_url, categories.name AS category_name 
-             FROM products 
-             INNER JOIN categories ON products.category_id = categories.category_id
-             WHERE categories.category_id = 2";
-$result_quan = $conn->query($sql_quan);
 
 if (isset($_POST['save_product'])) {
     $name = $_POST['name'];
@@ -20,7 +26,7 @@ if (isset($_POST['save_product'])) {
     $stock_quantity = $_POST['stock_quantity'];
     $category_id = $_POST['category_id'];
 
-    $target_dir = "image_product/"; 
+    $target_dir = "image_product/";
     $target_file = $target_dir . basename($_FILES["image"]["name"]);
     $upload_ok = 1;
     $image_file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -33,33 +39,42 @@ if (isset($_POST['save_product'])) {
         echo "<script>alert('Ảnh đã tồn tại.');</script>";
         $upload_ok = 0;
     }
-    if ($image_file_type != "jpg" && $image_file_type != "png" && $image_file_type != "jpeg" && $image_file_type != "gif"&& $image_file_type != "jfif"&& $image_file_type != "webp") {
+    if (!in_array($image_file_type, ['jpg', 'png', 'jpeg', 'gif', 'jfif', 'webp'])) {
         echo "<script>alert('Chỉ chấp nhận file JPG, JPEG, PNG & GIF.');</script>";
         $upload_ok = 0;
     }
     if ($upload_ok == 0) {
         echo "<script>alert('Upload ảnh thất bại.');</script>";
     } else {
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], "../" . $target_file)) { 
-            $sql = "INSERT INTO products (name, description, price, stock_quantity, category_id, image_url) 
-                    VALUES ('$name', '$description', '$price', '$stock_quantity', '$category_id', '$target_file')";
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], "../" . $target_file)) {
+            try {
+                $sql = "INSERT INTO products (name, description, price, stock_quantity, category_id, image_url) 
+                        VALUES (:name, :description, :price, :stock_quantity, :category_id, :image_url)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':description', $description);
+                $stmt->bindParam(':price', $price);
+                $stmt->bindParam(':stock_quantity', $stock_quantity);
+                $stmt->bindParam(':category_id', $category_id);
+                $stmt->bindParam(':image_url', $target_file);
 
-            if ($conn->query($sql) === TRUE) {
-                echo "<script>alert('Thêm sản phẩm thành công!');</script>";
-                echo "<script>document.getElementById('product-form').reset()</script>";
-                echo "<script>window.location.href = 'admin_product.php';</script>";
-
-
-            } else {
-                echo "<script>alert('Lỗi khi thêm sản phẩm: " . $conn->error . "');</script>";
+                if ($stmt->execute()) {
+                    echo "<script>alert('Thêm sản phẩm thành công!');</script>";
+                    echo "<script>document.getElementById('product-form').reset()</script>";
+                    echo "<script>window.location.href = 'admin_product.php';</script>";
+                } else {
+                    echo "<script>alert('Lỗi khi thêm sản phẩm.');</script>";
+                }
+            } catch (PDOException $e) {
+                echo "<script>alert('Lỗi khi thêm sản phẩm: " . $e->getMessage() . "');</script>";
             }
         } else {
             echo "<script>alert('Lỗi khi tải lên ảnh.');</script>";
         }
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,7 +137,7 @@ if (isset($_POST['save_product'])) {
 
     <!-- Nội dung -->
     <div class="content">
-        <h1 class="mb-4">Quản lý Sản phẩm</h1>
+      
 
         <!-- Nút thêm sản phẩm -->
         <div class="d-flex justify-content-end mb-3">
@@ -132,108 +147,68 @@ if (isset($_POST['save_product'])) {
         </div>
 
         <!-- Danh sách sản phẩm -->
-        <div class="card mb-4">
-        <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-    <h4 class="mb-0">Danh sách Áo</h4>
-</div>
-<div class="card-body">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">Tên sản phẩm</th>
-                <th class="text-center">Mô tả</th>
-                <th class="text-center">Giá</th>
-                <th class="text-center">Số lượng tồn kho</th>
-                <th class="text-center">Hình ảnh</th>
-                <th class="text-center">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if ($result_ao->num_rows > 0) {
-                while ($row = $result_ao->fetch_assoc()) {
-            ?>
-            <tr>
-                <td class="text-center"><?php echo $row['product_id']; ?></td>
-                <td><?php echo $row['name']; ?></td>
-                <td class="description"><?php echo $row['description']; ?></td>
-                <td class="text-end"><?php echo number_format($row['price'], 0, ',', '.'); ?>đ</td>
-                <td class="text-end"><?php echo $row['stock_quantity']; ?></td>
-                <td class="text-center">
-                    <img src="<?php echo "http://localhost/project_shopquanao/".$row['image_url']; ?>" alt="Product Image" class="product-image">
-                </td>
-                <td class="text-center">
-                    <a href="edit_product.php?product_id=<?php echo $row['product_id']; ?>" class="btn btn-warning btn-sm">
-                        <i class="fa-solid fa-pen"></i> Sửa
-                    </a>
-                    <a href="function/delete_product.php?id=<?php echo $row['product_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                        <i class="fa-solid fa-trash"></i> Xóa
-                    </a>
-                </td>
-            </tr>
-            <?php
-                }
-            } else {
-                echo "<tr><td colspan='7' class='text-center'>Không có sản phẩm nào.</td></tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
+        <div class="container mt-4">
+        <h1 class="mb-4 text-center">Quản lý Sản phẩm</h1>
 
+        <?php foreach ($categories as $category): ?>
+            <!-- Hiển thị danh mục -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><?php echo htmlspecialchars($category['name']); ?></h4>
+                </div>
+                <div class="card-body">
+                    <?php
+                    // Truy vấn sản phẩm thuộc danh mục
+                    $sql_products = "SELECT * FROM products WHERE category_id = ?";
+                    $stmt_products = $conn->prepare($sql_products);
+                    $stmt_products->execute([$category['category_id']]);
+                    $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
+                    ?>
 
-<div class="card mb-4">
-    <div class="card-header bg-success text-white">
-        <h4 class="mb-0">Danh sách Quần</h4>
+                    <?php if (!empty($products)): ?>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Tên sản phẩm</th>
+                                    <th class="text-center">Mô tả</th>
+                                    <th class="text-center">Giá</th>
+                                    <th class="text-center">Số lượng tồn kho</th>
+                                    <th class="text-center">Hình ảnh</th>
+                                    <th class="text-center">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($products as $product): ?>
+                                    <tr>
+                                        <td class="text-center"><?php echo htmlspecialchars($product['product_id']); ?></td>
+                                        <td><?php echo htmlspecialchars($product['name']); ?></td>
+                                        <td class="description"><?php echo htmlspecialchars($product['description']); ?></td>
+                                        <td class="text-end"><?php echo number_format($product['price'], 0, ',', '.'); ?>đ</td>
+                                        <td class="text-end"><?php echo htmlspecialchars($product['stock_quantity']); ?></td>
+                                        <td class="text-center">
+                                            <img src="<?php echo "http://localhost/project_shopquanao/" . htmlspecialchars($product['image_url']); ?>" alt="Product Image" class="product-image">
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="edit_product.php?product_id=<?php echo htmlspecialchars($product['product_id']); ?>" class="btn btn-warning btn-sm">
+                                                <i class="fa-solid fa-pen"></i> Sửa
+                                            </a>
+                                            <a href="function/delete_product.php?id=<?php echo htmlspecialchars($product['product_id']); ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
+                                                <i class="fa-solid fa-trash"></i> Xóa
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p class="text-center">Không có sản phẩm nào trong danh mục này.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
-    <div class="card-body">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-center">Tên sản phẩm</th>
-                    <th class="text-center">Mô tả</th>
-                    <th class="text-center">Giá</th>
-                    <th class="text-center">Số lượng tồn kho</th>
-                    <th class="text-center">Hình ảnh</th>
-                    <th class="text-center">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result_quan->num_rows > 0) {
-                    while ($row = $result_quan->fetch_assoc()) {
-                ?>
-                <tr>
-                    <td class="text-center"><?php echo $row['product_id']; ?></td>
-                    <td><?php echo $row['name']; ?></td>
-                    <td class="description"><?php echo $row['description']; ?></td>
-                    <td class="text-end"><?php echo number_format($row['price'], 0, ',', '.'); ?>đ</td>
-                    <td class="text-end"><?php echo $row['stock_quantity']; ?></td>
-                    <td class="text-center">
-                        <img src="<?php echo"http://localhost/project_shopquanao/". $row['image_url']; ?>" alt="Product Image" class="product-image">
-                    </td>
-                    <td class="text-center">
-                    <a href="edit_product.php?product_id=<?php echo $row['product_id']; ?>" class="btn btn-warning btn-sm">
-                        <i class="fa-solid fa-pen"></i> Sửa
-                    </a>
-                    <a href="function/delete_product.php?id=<?php echo $row['product_id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?');">
-                        <i class="fa-solid fa-trash"></i> Xóa
-                    </a>
-                    </td>
-                </tr>
-                <?php
-                    }
-                } else {
-                    echo "<tr><td colspan='7' class='text-center'>Không có sản phẩm nào.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-</div>
+
 
         <!-- Form thêm sản phẩm -->
         <div class="card shadow-lg" id="productForm">
@@ -261,10 +236,11 @@ if (isset($_POST['save_product'])) {
             <div class="mb-3">
                 <label for="category_id" class="form-label">Danh mục</label>
                 <select class="form-select" id="category_id" name="category_id" required>
-                    <option value="">-- Chọn danh mục --</option>
-                    <option value="1">Áo</option>
-                    <option value="2">Quần</option>
-                </select>
+                <option value="">-- Chọn danh mục --</option>
+                <?php foreach ($categories as $category): ?>
+                    <option value="<?php echo $category['category_id']; ?>"><?php echo htmlspecialchars($category['name']); ?></option>
+                <?php endforeach; ?>
+            </select>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Hình ảnh sản phẩm</label>

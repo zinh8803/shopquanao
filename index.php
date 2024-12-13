@@ -228,7 +228,22 @@ session_start(); // Bắt đầu session
     <?php 
  include("web/footer.php");
  ?>
-    <script src="./js/bootstrap.bundle.js"></script>
-    
+   <script src="./js/bootstrap.bundle.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+        // Kiểm tra query string ?success=1
+        <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Đặt hàng thành công!',
+                text: 'Cảm ơn bạn đã mua hàng',
+                timer: 3000, // Thời gian tự động đóng
+                showConfirmButton: false
+            });
+            // Xóa query string sau khi hiển thị thông báo
+            window.history.replaceState({}, document.title, window.location.pathname);
+        <?php endif; ?>
+    </script>
+  
 </body>
 </html>

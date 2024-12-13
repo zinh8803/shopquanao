@@ -3,25 +3,30 @@ include("./data_connect/db.php");
 
 $error = "";
 
-if(isset($_POST['register'])) {
+if (isset($_POST['register'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
     $email = $_POST['email'];
-    $sql_check_username = "SELECT * FROM user WHERE username = '$username'";
-    $result_check = $conn->query($sql_check_username);
 
-    if($result_check->num_rows > 0) {
-        $error = "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.";
-    } else {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql_insert_user = "INSERT INTO user (username, password, email) VALUES ('$username', '$hashed_password', '$email')";
+    try {
+        $stmt_check = $conn->prepare("SELECT * FROM user WHERE username = :username");
+        $stmt_check->execute(['username' => $username]);
         
-        if($conn->query($sql_insert_user) === TRUE) {
-            header("Location: ./login.php"); // Chuyển hướng đến trang đăng nhập
-            exit();
+        if ($stmt_check->rowCount() > 0) {
+            $error = "Tên người dùng đã tồn tại. Vui lòng chọn tên khác.";
         } else {
-            $error = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt_insert = $conn->prepare("INSERT INTO user (username, password, email) VALUES (:username, :password, :email)");
+            
+            if ($stmt_insert->execute(['username' => $username, 'password' => $hashed_password, 'email' => $email])) {
+                header("Location: ./login.php"); 
+                exit();
+            } else {
+                $error = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+            }
         }
+    } catch (PDOException $e) {
+        $error = "Lỗi hệ thống: " . $e->getMessage();
     }
 }
 ?>
@@ -55,7 +60,7 @@ if(isset($_POST['register'])) {
                     <div class="card-body">
                         <h5 class="card-title text-center">Đăng Ký</h5>
                        
-                        <?php if($error): ?>
+                        <?php if ($error): ?>
                             <div class="alert alert-danger"><?php echo $error; ?></div>
                         <?php endif; ?>
                        

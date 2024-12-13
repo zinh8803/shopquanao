@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
     <link rel="stylesheet" href="./fonts/fontawesome-free-6.5.2-web/fontawesome-free-6.5.2-web/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">    
     <title>Trang Chủ</title>
@@ -23,29 +25,10 @@
 <div class="content">
 <div class="container">
     <!-- banner -->
-    <div class="slider">  
-      <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="./image/image-banner4.jpg" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-            <img src="./image/image_banner3.jpg" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-            <img src="./image/image_banner5.jpg" class="d-block w-100" alt="...">
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>
-    </div>
+    <?php 
+  
+ include("web/banner.php");
+ ?>
     <!-- about -->
     <section id="contact" class="py-5 bg-light">
         <div class="container">
@@ -55,25 +38,25 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-8">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Họ và Tên</label>
-                            <input type="text" class="form-control" id="name" placeholder="Nhập họ và tên" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="name">Số điện thoại</label>
-                            <input type="text" class="form-control" id="sdt" placeholder="Nhập số điện thoại" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Nhập email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Lời Nhắn</label>
-                            <textarea class="form-control" id="message" rows="4" placeholder="Nhập lời nhắn" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Gửi</button>
-                    </form>
+                <form id="contactForm" class="p-4 border rounded shadow">
+        <div class="mb-3">
+            <label for="name" class="form-label">Họ và Tên</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Nhập họ và tên" required>
+        </div>
+        <div class="mb-3">
+            <label for="sdt" class="form-label">Số điện thoại</label>
+            <input type="text" class="form-control" id="sdt" name="sdt" placeholder="Nhập số điện thoại" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Nhập email" required>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Lời Nhắn</label>
+            <textarea class="form-control" id="message" name="message" rows="4" placeholder="Nhập lời nhắn" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Gửi</button>
+    </form>
                 </div>
             </div>
         </div>
@@ -90,6 +73,53 @@
  include("web/footer.php");
  ?>
     <script src="./js/bootstrap.bundle.js"></script>
-    
+<script>
+    $(document).ready(function () {
+        $('#contactForm').on('submit', function (e) {
+            e.preventDefault();
+
+            // Thu thập dữ liệu từ form
+            const formData = {
+                name: $('#name').val().trim(),
+                sdt: $('#sdt').val().trim(),
+                email: $('#email').val().trim(),
+                message: $('#message').val().trim()
+            };
+
+            // Kiểm tra dữ liệu
+            if (!formData.name || !formData.sdt || !formData.email || !formData.message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Vui lòng điền đầy đủ thông tin!'
+                });
+                return;
+            }
+
+            // Gửi dữ liệu qua AJAX
+            $.ajax({
+                url: 'function/process_contact.php',
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công!',
+                        text: 'Thông tin đã được gửi. Chúng tôi sẽ liên hệ sớm nhất.'
+                    });
+                    $('#contactForm')[0].reset(); 
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Có lỗi xảy ra khi gửi thông tin. Vui lòng thử lại sau!'
+                    });
+                }
+            });
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
