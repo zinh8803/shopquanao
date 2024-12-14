@@ -141,9 +141,10 @@ if (empty($errors)) {
     <div class="content">
         <div class="container">
             <!-- banner -->
-            <?php include("./web/banner.php"); ?>
+          
 
             <div class="container mt-5">
+            <?php include("./web/banner.php"); ?>
     <h2 class="text-center mb-4">Giỏ hàng của bạn</h2>
     <table class="table table-bordered table-hover text-center">
         <thead class="table-dark">

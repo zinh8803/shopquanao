@@ -187,7 +187,7 @@ if (isset($_POST['save_product'])) {
                                         <td class="text-end"><?php echo number_format($product['price'], 0, ',', '.'); ?>đ</td>
                                         <td class="text-end"><?php echo htmlspecialchars($product['stock_quantity']); ?></td>
                                         <td class="text-center">
-                                            <img src="<?php echo "http://localhost/project_shopquanao/" . htmlspecialchars($product['image_url']); ?>" alt="Product Image" class="product-image">
+                                            <img src="<?php echo "../" . htmlspecialchars($product['image_url']); ?>" alt="Product Image" class="product-image">
                                         </td>
                                         <td class="text-center">
                                             <a href="edit_product.php?product_id=<?php echo htmlspecialchars($product['product_id']); ?>" class="btn btn-warning btn-sm">

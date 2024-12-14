@@ -90,9 +90,10 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 </style>
 
 <?php include("web/header.php"); ?>
-<?php include("web/banner.php"); ?>
+
 
 <div class="container mt-5">
+<?php include("./web/banner.php"); ?>
     <h2 class="text-center">Giỏ hàng của bạn</h2>
 
     <?php if (!empty($result)): ?>

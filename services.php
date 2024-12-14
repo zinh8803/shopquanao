@@ -55,6 +55,15 @@ try {
     die("Lỗi truy vấn: " . $e->getMessage());
 }
 
+
+$sql_categories = "SELECT category_id, name FROM categories";
+$stmt_categories = $conn->prepare($sql_categories);
+$stmt_categories->execute();
+$categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
+
+// Xử lý giá trị đã chọn từ bộ lọc
+$category_filter = isset($_GET['category']) ? $_GET['category'] : '';
+
 ?>
 
 <!DOCTYPE html>
@@ -130,10 +139,15 @@ try {
                 <div class="mb-3">
                     <label for="category" class="form-label">Danh mục</label>
                     <select id="category" name="category" class="form-select">
-                        <option value="">Tất cả</option>
-                        <option value="1" <?php echo $category_filter == '1' ? 'selected' : ''; ?>>Áo</option>
-                        <option value="2" <?php echo $category_filter == '2' ? 'selected' : ''; ?>>Quần</option>
-                    </select>
+    <option value="">Tất cả</option>
+    <?php foreach ($categories as $category): ?>
+        <option value="<?php echo htmlspecialchars($category['category_id']); ?>" 
+                <?php echo $category_filter == $category['category_id'] ? 'selected' : ''; ?>>
+            <?php echo htmlspecialchars($category['name']); ?>
+        </option>
+    <?php endforeach; ?>
+</select>
+
                 </div>
                 <div class="mb-3">
                     <label for="price_min" class="form-label">Giá từ</label>

@@ -178,9 +178,16 @@ if (isset($_POST['update_product'])) {
             <div class="mb-3">
                 <label for="category_id" class="form-label">Danh mục</label>
                 <select class="form-select" id="category_id" name="category_id" required>
-                    <option value="1" <?php echo $product['category_id'] == 1 ? 'selected' : ''; ?>>Áo</option>
-                    <option value="2" <?php echo $product['category_id'] == 2 ? 'selected' : ''; ?>>Quần</option>
-                </select>
+                <option value="">-- Chọn danh mục --</option>
+                <?php
+                $sql_categories = "SELECT * FROM categories";
+                $stmt_categories = $conn->prepare($sql_categories);
+                $stmt_categories->execute();
+                $categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($categories as $category): ?>
+                    <option value="<?php echo $category['category_id']; ?>"><?php echo htmlspecialchars($category['name']); ?></option>
+                <?php endforeach; ?>
+            </select>
             </div>
             <div class="mb-3">
                 <label for="image" class="form-label">Hình ảnh sản phẩm</label>

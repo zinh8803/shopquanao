@@ -78,7 +78,7 @@ if (isset($_GET['order_id'])) {
             <tr>
                 <td class="text-center"><?php echo $detail['product_id']; ?></td>
                 <td class="text-center">
-                    <img src="<?php echo 'http://localhost/project_shopquanao/'. htmlspecialchars($detail['image_url']); ?>" alt="<?php echo htmlspecialchars($detail['product_name']); ?>" 
+                    <img src="<?php echo "../". htmlspecialchars($detail['image_url']); ?>" alt="<?php echo htmlspecialchars($detail['product_name']); ?>" 
                          style="width: 50px; height: 50px; object-fit: cover;">
                 </td>
                 <td><?php echo htmlspecialchars($detail['product_name']); ?></td>
