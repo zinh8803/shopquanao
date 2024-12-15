@@ -20,7 +20,7 @@
     <a href="./contact.php">
         <i class="fa-solid fa-envelope me-2"></i> Contact
     </a>
-    <a href="./Logout.php">
+    <a href="./logout.php">
         <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
     </a>
 </div>
