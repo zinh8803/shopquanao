@@ -1,22 +1,23 @@
-><style>
-    /* Footer */
+<style>
 .footer {
-    background-color: #343a40; /* Màu nền giống header */
-    color: #ffffff; /* Màu chữ trắng */
-    padding: 40px 0;
+    background-color: #343a40; 
+    color: #ffffff; 
+    padding: 40px 15px; /* Bổ sung padding cho lề */
     font-size: 14px;
+    line-height: 1.8;
 }
 
 .footer h6 {
-    color: #f8b400; /* Màu cam cho tiêu đề nổi bật */
+    color: #f8b400; 
     font-weight: bold;
     margin-bottom: 20px;
 }
 
 .footer__about ul,
 .footer__widget ul {
-    list-style: none;
-    padding: 0;
+    margin-bottom: 15px;
+    line-height: 1.8; 
+    font-size: 16px; 
 }
 
 .footer__about ul li,
@@ -27,21 +28,20 @@
 
 .footer__about ul li i {
     margin-right: 8px;
-    color: #f8b400; /* Màu cam cho icon */
+    color: #f8b400; 
 }
 
 .footer__widget ul li a {
-    color: #ffffff; /* Màu chữ trắng */
+    color: #ffffff; 
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .footer__widget ul li a:hover {
-    color: #f8b400; /* Hiệu ứng hover đổi màu */
+    color: #f8b400; 
     text-decoration: underline;
 }
 
-/* Form đăng ký */
 .footer__widget form {
     display: flex;
     margin-top: 15px;
@@ -70,14 +70,16 @@
     color: #f8b400;
 }
 
-/* Responsive cho màn hình nhỏ */
 @media (max-width: 768px) {
     .footer__widget ul {
         margin-bottom: 20px;
     }
+    .footer {
+        padding: 20px; /* Đảm bảo khoảng cách trên thiết bị nhỏ */
+    }
 }
-
 </style>
+
 
 <div class="footer " >
       <div class="container">

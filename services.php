@@ -25,13 +25,11 @@ $search_query = $_GET['search'] ?? null;
 $query = "SELECT product_id, name, description, price, stock_quantity, image_url FROM products WHERE 1=1";
 $params = [];
 
-// Lọc theo danh mục
 if ($category_filter) {
     $query .= " AND category_id = ?";
     $params[] = $category_filter;
 }
 
-// Lọc theo giá
 if (!empty($price_min)) {
     $query .= " AND price >= ?";
     $params[] = $price_min;
@@ -41,7 +39,7 @@ if (!empty($price_max)) {
     $params[] = $price_max;
 }
 
-// Lọc theo tìm kiếm
+
 if ($search_query) {
     $query .= " AND name LIKE ?";
     $params[] = "%" . $search_query . "%";
@@ -61,7 +59,6 @@ $stmt_categories = $conn->prepare($sql_categories);
 $stmt_categories->execute();
 $categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
 
-// Xử lý giá trị đã chọn từ bộ lọc
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 
 ?>
@@ -80,46 +77,46 @@ $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
 <body>
 <style>
 .card {
-    width: 12rem; /* Giảm chiều rộng sản phẩm */
-    margin: 15px auto; /* Canh giữa theo chiều ngang */
+    width: 12rem;
+    margin: 15px auto; 
     border: none;
     border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
     transition: all 0.3s ease-in-out;
 }
 
 .card:hover {
-    transform: translateY(-5px); /* Hiệu ứng hover */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Đổ bóng khi hover */
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); 
 }
 
 .card img {
-    width: 100%; /* Đảm bảo ảnh theo chiều rộng của thẻ card */
-    height: auto; /* Tự động điều chỉnh chiều cao */
-    object-fit: cover; /* Đảm bảo không bị méo ảnh */
+    width: 100%; 
+    height: auto; 
+    object-fit: cover;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
 
 .card-body h5.card-title {
-    font-size: 0.9rem; /* Giảm kích thước chữ */
+    font-size: 0.9rem; 
     text-align: center;
     color: #333;
     margin-bottom: 5px;
 }
 
 .card-body p.card-text {
-    font-size: 0.85rem; /* Giảm kích thước chữ */
+    font-size: 0.85rem;
     text-align: center;
     color: #888;
     margin-bottom: 10px;
 }
 
 .card-body .btn {
-    font-size: 0.85rem; /* Giảm kích thước nút */
-    padding: 5px 8px; /* Thu gọn khoảng cách trong nút */
+    font-size: 0.85rem;
+    padding: 5px 8px; 
     display: block;
-    margin: 0 auto; /* Canh giữa nút */
+    margin: 0 auto; 
 }
 
 
