@@ -11,7 +11,6 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     try {
-        // Truy vấn kiểm tra username
         $sql_check_user = "SELECT * FROM user WHERE username = :username";
         $stmt = $conn->prepare($sql_check_user);
         $stmt->bindParam(':username', $username);
@@ -19,8 +18,6 @@ if (isset($_POST['login'])) {
 
         if ($stmt->rowCount() > 0) {
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Kiểm tra mật khẩu
             if (password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['Id'];
                 $_SESSION['username'] = $user['username'];

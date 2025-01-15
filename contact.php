@@ -78,7 +78,7 @@
         $('#contactForm').on('submit', function (e) {
             e.preventDefault();
 
-            // Thu thập dữ liệu từ form
+         
             const formData = {
                 name: $('#name').val().trim(),
                 sdt: $('#sdt').val().trim(),
@@ -86,7 +86,7 @@
                 message: $('#message').val().trim()
             };
 
-            // Kiểm tra dữ liệu
+      
             if (!formData.name || !formData.sdt || !formData.email || !formData.message) {
                 Swal.fire({
                     icon: 'error',
@@ -96,7 +96,7 @@
                 return;
             }
 
-            // Gửi dữ liệu qua AJAX
+     
             $.ajax({
                 url: 'function/process_contact.php',
                 type: 'POST',

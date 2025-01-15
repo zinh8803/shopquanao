@@ -39,6 +39,7 @@ if (isset($_GET['product_id'])) {
 </head>
 <body>
 <?php include("web/header.php"); ?>
+<div class="container">
 <?php include("web/banner.php"); ?>
 <div class="container mt-5">
     <div class="row">
@@ -56,6 +57,8 @@ if (isset($_GET['product_id'])) {
                     <?php endif; ?>
         </div>
     </div>
+</div>
+
 </div>
 
 <?php include("web/footer.php"); ?>

@@ -207,7 +207,7 @@ $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
                         title: 'Thành công!',
                         text: response.message,
                         timer: 2000, 
-                        showConfirmButton: false
+                        showConfirmButton: true
                     });
                     $(".shopping .badge").text(response.cart_count);
                 } else {

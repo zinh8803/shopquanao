@@ -93,7 +93,6 @@ include("web/header.php"); ?>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Fetch user info and populate form
     fetch("function/get_user.php")
         .then((response) => response.json())
         .then((data) => {
@@ -121,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-    // Handle form submission
     document.getElementById("editForm").addEventListener("submit", function (e) {
         e.preventDefault();
         const formData = new FormData(this);

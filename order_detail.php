@@ -2,7 +2,6 @@
 session_start();
 include("./data_connect/db.php");
 
-// Kiểm tra nếu người dùng chưa đăng nhập
 if (!isset($_SESSION['user_id'])) {
     echo "Bạn cần đăng nhập để xem chi tiết đơn hàng!";
     exit;
@@ -15,7 +14,6 @@ if (!$order_id) {
 }
 
 try {
-    // Lấy thông tin đơn hàng
     $sql_order = "SELECT * FROM orders WHERE order_id = ?";
     $stmt_order = $conn->prepare($sql_order);
     $stmt_order->execute([$order_id]);
