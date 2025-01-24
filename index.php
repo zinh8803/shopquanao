@@ -15,8 +15,11 @@
     <!-- menu -->
     <?php
 session_start(); // Bắt đầu session
+include("update_online.php"); // Cập nhật trạng thái online
+$userId = $_SESSION['user_id'] ?? null;
 
-
+// Theo dõi người truy cập
+trackUser($conn, $userId);
 ?>
 
  <?php 

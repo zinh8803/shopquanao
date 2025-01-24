@@ -83,11 +83,34 @@ foreach ($daily_revenue_data as $row) {
 </head>
 <body>
     <!-- Sidebar -->
-    <?php include("includes/sidebar.php"); ?>
+    <?php include("includes/sidebar.php");
+    // Đếm tất cả người dùng (bao gồm cả chưa đăng nhập)
+$stmt = $conn->prepare("SELECT COUNT(*) as total_visitors FROM online_users");
+$stmt->execute();
+$totalVisitors = $stmt->fetch()['total_visitors'];
+
+// Đếm người dùng đã đăng nhập
+$stmt = $conn->prepare("SELECT COUNT(*) as logged_in_users FROM online_users WHERE user_id IS NOT NULL");
+$stmt->execute();
+$loggedInUsers = $stmt->fetch()['logged_in_users'];
+
+// Đếm người dùng chưa đăng nhập
+$notLoggedInUsers = $totalVisitors - $loggedInUsers;
+
+
+
+    
+
+    ?>
 
     <!-- Content -->
     <div class="content">
         <h1>Admin Dashboard</h1>
+        <?php
+        echo "Tổng số người truy cập: $totalVisitors<br>";
+        echo "Người dùng đã đăng nhập: $loggedInUsers<br>";
+        echo "Người dùng chưa đăng nhập: $notLoggedInUsers<br>";
+        ?>
 
         <!-- Summary Boxes -->
         <div class="row mb-4">
