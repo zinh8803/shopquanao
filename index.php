@@ -14,11 +14,10 @@
 <body>
     <!-- menu -->
     <?php
-session_start(); // Bắt đầu session
-include("update_online.php"); // Cập nhật trạng thái online
+session_start();
+include("update_online.php"); 
 $userId = $_SESSION['user_id'] ?? null;
 
-// Theo dõi người truy cập
 trackUser($conn, $userId);
 ?>
 

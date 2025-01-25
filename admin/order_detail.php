@@ -1,7 +1,6 @@
 <?php
 include("db_connect.php");
 
-// Lấy chi tiết đơn hàng
 if (isset($_GET['order_id'])) {
     $order_id = (int)$_GET['order_id'];
 

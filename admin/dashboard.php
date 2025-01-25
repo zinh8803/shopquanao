@@ -2,29 +2,24 @@
 session_start();
 include("db_connect.php");
 
-// Kiểm tra quyền truy cập
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
 }
 
-// Tạm thời đặt số lượng đơn hàng pending và cancelled là 0
 $pending_orders = 0;
 $cancelled_orders = 0;
 
-// Lấy tổng số đơn hàng
 $sql_total_orders = "SELECT COUNT(order_id) AS total_orders FROM orders";
 $stmt_total_orders = $conn->prepare($sql_total_orders);
 $stmt_total_orders->execute();
 $total_orders = $stmt_total_orders->fetch(PDO::FETCH_ASSOC)['total_orders'];
 
-// Lấy tổng doanh thu
 $sql_total_revenue = "SELECT SUM(total_price) AS total_revenue FROM orders";
 $stmt_total_revenue = $conn->prepare($sql_total_revenue);
 $stmt_total_revenue->execute();
 $total_revenue = $stmt_total_revenue->fetch(PDO::FETCH_ASSOC)['total_revenue'];
 
-// Tính toán doanh thu theo ngày (giới hạn 30 ngày gần nhất)
 $sql_daily_revenue = "
     SELECT 
         DATE(created_at) AS order_date, 
@@ -37,7 +32,6 @@ $stmt_daily_revenue = $conn->prepare($sql_daily_revenue);
 $stmt_daily_revenue->execute();
 $daily_revenue_data = $stmt_daily_revenue->fetchAll(PDO::FETCH_ASSOC);
 
-// Chuẩn bị dữ liệu cho biểu đồ
 $order_dates = [];
 $daily_revenues = [];
 foreach ($daily_revenue_data as $row) {
@@ -84,18 +78,16 @@ foreach ($daily_revenue_data as $row) {
 <body>
     <!-- Sidebar -->
     <?php include("includes/sidebar.php");
-    // Đếm tất cả người dùng (bao gồm cả chưa đăng nhập)
-$stmt = $conn->prepare("SELECT COUNT(*) as total_visitors FROM online_users");
-$stmt->execute();
-$totalVisitors = $stmt->fetch()['total_visitors'];
 
-// Đếm người dùng đã đăng nhập
-$stmt = $conn->prepare("SELECT COUNT(*) as logged_in_users FROM online_users WHERE user_id IS NOT NULL");
-$stmt->execute();
-$loggedInUsers = $stmt->fetch()['logged_in_users'];
+// $stmt = $conn->prepare("SELECT COUNT(*) as total_visitors FROM online_users");
+// $stmt->execute();
+// $totalVisitors = $stmt->fetch()['total_visitors'];
 
-// Đếm người dùng chưa đăng nhập
-$notLoggedInUsers = $totalVisitors - $loggedInUsers;
+// $stmt = $conn->prepare("SELECT COUNT(*) as logged_in_users FROM online_users WHERE user_id IS NOT NULL");
+// $stmt->execute();
+// $loggedInUsers = $stmt->fetch()['logged_in_users'];
+
+// $notLoggedInUsers = $totalVisitors - $loggedInUsers;
 
 
 
@@ -106,11 +98,12 @@ $notLoggedInUsers = $totalVisitors - $loggedInUsers;
     <!-- Content -->
     <div class="content">
         <h1>Admin Dashboard</h1>
-        <?php
-        echo "Tổng số người truy cập: $totalVisitors<br>";
-        echo "Người dùng đã đăng nhập: $loggedInUsers<br>";
-        echo "Người dùng chưa đăng nhập: $notLoggedInUsers<br>";
-        ?>
+        <div>
+    <h3>Thông tin truy cập</h3>
+    <p>Tổng số người truy cập: <span id="totalVisitors">0</span></p>
+    <p>Số người dùng đã đăng nhập: <span id="loggedInUsers">0</span></p>
+    <p>Số người dùng chưa đăng nhập: <span id="notLoggedInUsers">0</span></p>
+</div>
 
         <!-- Summary Boxes -->
         <div class="row mb-4">
@@ -156,6 +149,29 @@ $notLoggedInUsers = $totalVisitors - $loggedInUsers;
             </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateUserCounts() {
+        $.ajax({
+            url: "/project_shopquanao/xuly_online.php",
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                console.log("Dữ liệu nhận được:", data); 
+                $('#totalVisitors').text(data.total_visitors);
+                $('#loggedInUsers').text(data.logged_in_users);
+                $('#notLoggedInUsers').text(data.not_logged_in_users);
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error); 
+                console.error("Response:", xhr.responseText);
+            }
+        });
+    }
+    updateUserCounts();
+    setInterval(updateUserCounts, 2000);
+</script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
