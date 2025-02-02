@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 
 $servername = "localhost";
 $username = "root";
@@ -12,4 +12,4 @@ try {
     echo "Kết nối thất bại: " . $e->getMessage();
 }
 
-?>
+?> 
